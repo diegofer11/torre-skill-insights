@@ -4,7 +4,7 @@ import httpx
 import pytest
 
 from app.core.constants import BASE_GENOME_URL, BASE_OPPORTUNITIES_URL
-from app.services.torre_client import TorreClient
+from app.client.torre_client import TorreClient
 
 
 @pytest.mark.asyncio
