@@ -23,3 +23,42 @@ async def test_get_user_skills(mocker):
     assert data["username"] == "testuser"
     assert "Python" in data["skills"]
     assert "FastAPI" in data["skills"]
+
+
+@pytest.mark.asyncio
+async def test_get_user_skills_invalid_username_length():
+    transport = httpx.ASGITransport(app=app)
+
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        response = await ac.get(f"{URL_PREFIX}/users/_/skills")
+
+    assert response.status_code == 400
+
+    data = response.json()
+    assert "Username must be at least 4 characters long." in data["detail"]
+
+
+@pytest.mark.asyncio
+async def test_get_user_skills_invalid_username_only_numbers(mocker):
+    transport = httpx.ASGITransport(app=app)
+
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        response = await ac.get(f"{URL_PREFIX}/users/1233/skills")
+
+    assert response.status_code == 400
+
+    data = response.json()
+    assert "Username cannot be a number." in data["detail"]
+
+
+@pytest.mark.asyncio
+async def test_get_user_skills_invalid_username_spaces(mocker):
+    transport = httpx.ASGITransport(app=app)
+
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        response = await ac.get(f"{URL_PREFIX}/users/    /skills")
+
+    assert response.status_code == 400
+
+    data = response.json()
+    assert "Username must be provided and cannot be empty." in data["detail"]

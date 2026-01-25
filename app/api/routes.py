@@ -17,7 +17,6 @@ def validate_username(username) -> None:
 
 @router.get("/{username}/skills")
 async def get_user_skills(username: str):
-    """TODO validate username before calling API"""
     validate_username(username)
 
     client = TorreClient()
