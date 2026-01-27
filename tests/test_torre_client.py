@@ -5,6 +5,7 @@ import pytest
 
 from app.core.constants import BASE_GENOME_URL, BASE_OPPORTUNITIES_URL
 from app.client.torre_client import TorreClient
+from app.main import app
 
 
 @pytest.mark.asyncio
@@ -104,3 +105,26 @@ async def test_find_opportunities_invalid_json(mocker):
         await client.find_opportunities(skill, limit=5)
 
     await client.close()
+
+
+@pytest.mark.asyncio
+async def test_get_user_insights_success(mocker):
+    mock_genome = {"strengths": [{"name": "Python"}, {"name": "FastAPI"}]}
+    mock_opportunities = {"results": [{"skills": [{"name": "Python"}, {"name": "Django"}]}]}
+
+    mocker.patch("app.client.torre_client.TorreClient.get_user_genome", return_value=mock_genome)
+    mocker.patch("app.client.torre_client.TorreClient.find_opportunities", return_value=mock_opportunities)
+
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="https://test") as ac:
+        response = await ac.get("/api/v1/users/testuser/insights")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    # Assertions on username and skills
+    assert "Python" in data["skills"]
+    assert "FastAPI" in data["skills"]
+
+    # Assertions on insights
+    assert any("Django" in [s["name"] for s in opp["skills"]] for opp in data["insights"]["Python"])
