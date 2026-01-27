@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 from app.client.torre_client import TorreClient
 from app.core.validators import validate_username
 
@@ -19,6 +21,8 @@ async def get_user_skills_service(username: str) -> dict:
         genome = await client.get_user_genome(username)
         strengths = genome.get("strengths", [])
         skills = [s.get("name") for s in strengths if "name" in s]
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
     finally:
         await client.close()
 

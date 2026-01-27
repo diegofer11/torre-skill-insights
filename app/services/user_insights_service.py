@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 from app.client.torre_client import TorreClient
 from app.core.validators import validate_username
 from app.services.user_skills_service import get_user_skills_service
@@ -24,6 +26,8 @@ async def get_user_insights_service(username: str, limit: int = 5) -> dict:
         for skill in skills:
             opportunities = await client.find_opportunities(skill, limit=limit)
             insights[skill] = opportunities.get("results", [])
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
     finally:
         await client.close()
 
