@@ -1,4 +1,7 @@
+from typing import Optional
+
 from fastapi import APIRouter
+from fastapi.params import Query
 
 from app.core.constants import URL_PREFIX
 from app.services.user_insights_service import get_user_insights_service
@@ -13,5 +16,20 @@ async def get_user_skills(username: str):
 
 
 @router.get("/{username}/insights")
-async def get_user_insights(username: str):
-    return await get_user_insights_service(username)
+async def get_user_insights(
+        username: str,
+        limit: Optional[int] = Query(5, description="Maximum number of opportunities to fetch per skill"),
+        currency: Optional[str] = Query(None, description="Reference currency: USD, EUR, GBP, JPY"),
+        periodicity: Optional[str] = Query(None, description="Periodicity: hourly, daily, weekly, monthly"),
+        lang: Optional[str] = Query(None, description="Language"),
+        context_feature: Optional[str] = Query(None, description="Search context"),
+        criteria: str = Query("AND", description="Search criteria operator: AND, OR")
+):
+    return await get_user_insights_service(
+        username=username,
+        limit=limit,
+        currency=currency,
+        periodicity=periodicity,
+        lang=lang,
+        context_feature=context_feature,
+        criteria=criteria)

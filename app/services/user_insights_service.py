@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import HTTPException
 from httpx import HTTPStatusError
 
@@ -10,7 +12,15 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 
-async def get_user_insights_service(username: str, limit: int = 5) -> dict:
+async def get_user_insights_service(
+        username: str,
+        limit: Optional[int] = None,
+        currency: Optional[str] = None,
+        periodicity: Optional[str] = None,
+        lang: Optional[str] = None,
+        context_feature: Optional[str] = None,
+        criteria: str = "AND"
+) -> dict:
     """
     Fetches insights for the specified user based on their skills and related opportunities.
     The service interacts with user skills and opportunities data to generate a detailed
@@ -18,6 +28,11 @@ async def get_user_insights_service(username: str, limit: int = 5) -> dict:
 
     :param username: The username of the individual whose insights are to be fetched.
     :param limit: The maximum number of opportunities to fetch for each skill. Defaults to 5.
+    :param currency:
+    :param periodicity:
+    :param lang:
+    :param context_feature:
+    :param criteria:
     :return: A dictionary containing the user's username, their skills, and insights which
              include opportunities related to each skill.
     """
@@ -27,7 +42,15 @@ async def get_user_insights_service(username: str, limit: int = 5) -> dict:
         user_data = await get_user_skills_service(username)
         skills = user_data.get("skills", [])
 
-        opportunities = await client.find_opportunities(skills, limit=limit)
+        opportunities = await client.find_opportunities(
+            skills,
+            limit=limit,
+            currency=currency,
+            periodicity=periodicity,
+            lang=lang,
+            context_feature=context_feature,
+            criteria=criteria
+        )
 
         insights = {
             "opportunities": opportunities.get("results", []),

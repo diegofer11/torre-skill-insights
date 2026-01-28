@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 
 import httpx
 
@@ -23,7 +24,16 @@ class TorreClient:
         resp.raise_for_status()
         return resp.json()
 
-    async def find_opportunities(self, skills: list[str], limit: int = 5) -> dict:
+    async def find_opportunities(
+            self,
+            skills: list[str],
+            limit: Optional[int] = None,
+            currency: Optional[str] = None,
+            periodicity: Optional[str] = None,
+            lang: Optional[str] = None,
+            context_feature: Optional[str] = None,
+            criteria: str = "AND"
+    ) -> dict:
         """
         Finds and retrieves opportunities related to a specific skill.
 
@@ -35,6 +45,11 @@ class TorreClient:
         :param skills: A list of strings representing the skills to search for.
         :param limit: An integer specifying the maximum number of results to retrieve.
             Defaults to 10.
+        :param currency: A string representing the currency to filter results by.
+        :param periodicity: A string representing the periodicity to filter results by.
+        :param lang: A string representing the language to filter results by.
+        :param context_feature: A string representing the context feature to filter results by.
+        :param criteria: A string representing the search criteria operator. Defaults to "AND".
         :return: A dictionary containing the retrieved opportunities.
         """
         headers = {
@@ -42,6 +57,14 @@ class TorreClient:
             "Content-Type": "application/json",
             "User-Agent": "PostmanRuntime/7.51.0"
         }
+
+        params = {}
+        if limit: params["size"] = limit
+        if currency: params["currency"] = currency
+        if periodicity: params["periodicity"] = periodicity
+        if lang: params["lang"] = lang
+        if context_feature: params["contextFeature"] = context_feature
+        if criteria: params["criteria"] = criteria
 
         body = {
             "or":
@@ -61,7 +84,11 @@ class TorreClient:
         }
         print("Body enviado:", json.dumps(body, indent=2))
 
-        resp = await self.client.post(f"{BASE_OPPORTUNITIES_URL}?size={limit}", json=body, headers=headers)
+        resp = await self.client.post(
+            f"{BASE_OPPORTUNITIES_URL}",
+            headers=headers,
+            params=params,
+            json=body, )
 
         print("Request URL:", resp.request.url)
         print("Request Headers:", resp.request.headers)
