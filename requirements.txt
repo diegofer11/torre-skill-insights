@@ -1,2 +1,8 @@
 
 fastapi
+uvicorn
+httpx
+pydantic
+pytest
+respx
+mocker
