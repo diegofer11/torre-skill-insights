@@ -1,4 +1,3 @@
-import json
 from typing import Optional
 
 import httpx
@@ -32,7 +31,7 @@ class TorreClient:
             periodicity: Optional[str] = None,
             lang: Optional[str] = None,
             context_feature: Optional[str] = None,
-            criteria: str = "AND"
+            criteria: Optional[str] = None
     ) -> dict:
         """
         Finds and retrieves opportunities related to a specific skill.
@@ -82,17 +81,12 @@ class TorreClient:
                     {"status": {"code": "open"}}
                 ]
         }
-        print("Body enviado:", json.dumps(body, indent=2))
 
         resp = await self.client.post(
             f"{BASE_OPPORTUNITIES_URL}",
             headers=headers,
             params=params,
             json=body, )
-
-        print("Request URL:", resp.request.url)
-        print("Request Headers:", resp.request.headers)
-        print("Request Body:", resp.request.content.decode())
 
         resp.raise_for_status()
         return resp.json()

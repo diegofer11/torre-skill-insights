@@ -7,10 +7,6 @@ from app.client.torre_client import TorreClient
 from app.core.validators import validate_username
 from app.services.user_skills_service import get_user_skills_service
 
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
-
 
 async def get_user_insights_service(
         username: str,
@@ -19,7 +15,7 @@ async def get_user_insights_service(
         periodicity: Optional[str] = None,
         lang: Optional[str] = None,
         context_feature: Optional[str] = None,
-        criteria: str = "AND"
+        criteria: Optional[str] = None
 ) -> dict:
     """
     Fetches insights for the specified user based on their skills and related opportunities.

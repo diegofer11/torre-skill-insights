@@ -19,10 +19,10 @@ async def get_user_skills(username: str):
 async def get_user_insights(
         username: str,
         limit: Optional[int] = Query(5, description="Maximum number of opportunities to fetch per skill"),
-        currency: Optional[str] = Query(None, description="Reference currency: USD, EUR, GBP, JPY"),
-        periodicity: Optional[str] = Query(None, description="Periodicity: hourly, daily, weekly, monthly"),
-        lang: Optional[str] = Query(None, description="Language"),
-        context_feature: Optional[str] = Query(None, description="Search context"),
+        currency: Optional[str] = Query("USD", description="Reference currency: USD, EUR, GBP, JPY"),
+        periodicity: Optional[str] = Query("hourly", description="Periodicity: hourly, daily, weekly, monthly"),
+        lang: Optional[str] = Query("en", description="Language"),
+        context_feature: Optional[str] = Query("job_feed", description="Search context"),
         criteria: str = Query("AND", description="Search criteria operator: AND, OR")
 ):
     return await get_user_insights_service(
