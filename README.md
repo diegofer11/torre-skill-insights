@@ -23,18 +23,16 @@ Clone the repository and install dependencies with Poetry:
 ```bash
 git clone https://github.com/diegofer11/torre-skill-insights.git
 cd torre-skill-insights
+
+# Install dependencies using poetry
+pip install poetry
 poetry install
-```
 
----
-
-## Running the Service
-
-Start the FastAPI server with Uvicorn:
-
-```bash
+# Run the service
 poetry run uvicorn app.main:app --reload
 ```
+
+## Running the Service
 
 The API will be available at http://127.0.0.1:8000
 
