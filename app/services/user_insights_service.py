@@ -1,8 +1,13 @@
 from fastapi import HTTPException
+from httpx import HTTPStatusError
 
 from app.client.torre_client import TorreClient
 from app.core.validators import validate_username
 from app.services.user_skills_service import get_user_skills_service
+
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 async def get_user_insights_service(username: str, limit: int = 5) -> dict:
@@ -20,14 +25,19 @@ async def get_user_insights_service(username: str, limit: int = 5) -> dict:
     client = TorreClient()
     try:
         user_data = await get_user_skills_service(username)
-        skills = user_data["skills"]
+        skills = user_data.get("skills", [])
 
-        insights = {}
-        for skill in skills:
-            opportunities = await client.find_opportunities(skill, limit=limit)
-            insights[skill] = opportunities.get("results", [])
+        opportunities = await client.find_opportunities(skills, limit=limit)
+
+        insights = {
+            "opportunities": opportunities.get("results", []),
+            "total": opportunities.get("total", 0)
+        }
+    except HTTPStatusError as e:
+        raise HTTPException(status_code=e.response.status_code,
+                            detail=e.response.text)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
     finally:
         await client.close()
 
