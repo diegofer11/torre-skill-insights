@@ -32,7 +32,7 @@ async def test_get_user_genome_success(mocker):
 @pytest.mark.asyncio
 async def test_find_opportunities_success(mocker):
     client = TorreClient()
-    skill = "Python"
+    skills = ["Python"]
     mock_json_response = {"results": [{"id": "job1", "title": "Backend Developer"}]}
 
     mock_response = Mock()
@@ -42,31 +42,18 @@ async def test_find_opportunities_success(mocker):
 
     mocker.patch.object(httpx.AsyncClient, "post", new=AsyncMock(return_value=mock_response))
 
-    result = await client.find_opportunities(skill, limit=5)
+    result = await client.find_opportunities(skills, limit=5)
 
     httpx.AsyncClient.post.assert_called_once_with(
-        f"{BASE_OPPORTUNITIES_URL}?size=5",
-        json={
-            "and":
-                [
-                    {"skill/role":
-                        {
-                            "text": skill,
-                            "proficiency": "expert"
-                        }
-                    },
-                    {
-                        "status":
-                            {
-                                "code": "open"
-                            }
-                    }
-                ]
-        }
-    )
+        BASE_OPPORTUNITIES_URL,
+        headers={"Accept": "application/json", "Content-Type": "application/json",
+                 "User-Agent": "PostmanRuntime/7.51.0"},
+        params={"size": 5},
+        json={"or": [{"skill/role": {"text": "Python", "proficiency": "expert"}}, {"status": {"code": "open"}}]})
+
     assert result == mock_json_response
 
-    await client.close()
+    await (client.close())
 
 
 @pytest.mark.asyncio
@@ -123,8 +110,9 @@ async def test_get_user_insights_success(mocker):
     data = response.json()
 
     # Assertions on username and skills
+    assert data["username"] == "testuser"
     assert "Python" in data["skills"]
     assert "FastAPI" in data["skills"]
 
     # Assertions on insights
-    assert any("Django" in [s["name"] for s in opp["skills"]] for opp in data["insights"]["Python"])
+    assert any("Django" in [s["name"] for s in opp["skills"]] for opp in data["insights"]["opportunities"])
