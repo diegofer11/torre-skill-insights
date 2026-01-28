@@ -1,15 +1,7 @@
 # Project overview
 
-The **Skills Insights Dashboard** is a FastAPI-based application that integrates with the Torre APIs to provide
-actionable insights about professional skills and their demand in the job market.
-
-The system retrieves a user's genome and analyzes it to identify the most relevant skills and their demand in the job
-market, generating a dashboard that highlights:
-
-- Top skills of the user.
-- Market demand for the skills.
-- Potential opportunities for the skills.
-- Recommendations for the skills.
+A FastAPI application that retrieves user genome from Torre API and analyzes it to identify skills and their demand in
+the job market.
 
 ---
 
@@ -23,6 +15,52 @@ market, generating a dashboard that highlights:
 - **Tooling:** uvicorn, PyCharm
 
 ---
+
+## Installation
+
+Clone the repository and install dependencies with Poetry:
+
+```bash
+git clone https://github.com/diegofer11/torre-skill-insights.git
+cd torre-skill-insights
+poetry install
+```
+
+---
+
+## Running the Service
+
+Start the FastAPI server with Uvicorn:
+
+```bash
+poetry run uvicorn app.main:app --reload
+```
+
+The API will be available at http://127.0.0.1:8000
+
+### Usage
+
+Example request:
+
+Get user skills:
+
+```bash
+GET /api/v1/users/{username}/torre/skills
+```
+
+Get user insights:
+
+```bash
+GET /api/v1/users/{username}/insights?currency=USD&periodicity=hourly&lang=en&contextFeature=job_feed&criteria=OR
+```
+
+### Testing
+
+Run the test suite with:
+
+```bash
+poetry run pytest
+```
 
 # Architecture overview
 
